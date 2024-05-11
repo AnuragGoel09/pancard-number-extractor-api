@@ -2,7 +2,7 @@
 
 from flask import Flask, request, jsonify 
 from PIL import Image
-import pytesseract
+import easyocr
 import io
 
 app = Flask(__name__)
@@ -19,9 +19,9 @@ def extract_text():
     try:
         # Read image from the file upload
         image = Image.open(io.BytesIO(image_file.read()))
-
+        reader = easyocr.Reader(['en'])
         # Perform OCR using pytesseract
-        extracted_text = pytesseract.image_to_string(image)
+        extracted_text = reader.readtext(image)
 
         return jsonify({'text': extracted_text}), 200
     except Exception as e:
