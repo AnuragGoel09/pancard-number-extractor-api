@@ -1,14 +1,11 @@
 # app.py
 
-from flask import Flask, request, jsonify 
-from PIL import Image
+from flask import Flask, request, jsonify
 import easyocr
 import cv2
 import numpy as np
-reader = easyocr.Reader(['en'])
 app = Flask(__name__)
-
-
+reader = easyocr.Reader(['en'])
 @app.route('/upload',methods=['GET'])
 def extract_text():
     if 'image' not in request.files:
