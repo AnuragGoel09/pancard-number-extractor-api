@@ -1,12 +1,14 @@
-# app.py
-
 from flask import Flask, request, jsonify
 import easyocr
 import cv2
 import numpy as np
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
+
 reader = easyocr.Reader(['en'])
-@app.route('/upload',methods=['GET'])
+@app.route('/upload',methods=['POST'])
 def extract_text():
     if 'image' not in request.files:
         return jsonify({'error': 'No image uploaded'}), 400
@@ -45,7 +47,7 @@ def get_pan_number(image):
                 flag=check_pan(item)
                 if flag:
                     return item
-    return "image not proper"
+    return "Image is not proper"
 def check_pan(name):
     if len(name)!=10:
         return False
@@ -68,4 +70,4 @@ def check_pan(name):
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0',port='4000')

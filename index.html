@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Input and API Text Display</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+
+  .container {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  label {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #image-preview {
+    margin-top: 20px;
+    max-width: 300px;
+    max-height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  #image-preview img {
+    width: 100%;
+    height: auto;
+  }
+
+  #api-text {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Select an Image</h2>
+  <input type="file" id="image-input" accept=".png, .jpg, .jpeg">
+  <label for="image-input">Choose File</label>
+  <div id="image-preview"></div>
+  <div id="api-text"></div>
+</div>
+
+<script>
+  document.getElementById('image-input').addEventListener('change',async function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async function() {
+        document.getElementById('api-text').textContent = "Loading..";
+        const preview = document.getElementById('image-preview');
+        const image = new Image();
+        image.src = reader.result;
+        preview.innerHTML = '';
+        preview.appendChild(image);
+
+        const formData = new FormData();
+        formData.append('image', file);
+        try {
+        const response = await fetch('http://localhost:4000/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log(data)
+        document.getElementById('api-text').textContent = data.text;
+      } catch (error) {
+        console.error('Error fetching API:', error);
+        document.getElementById('api-text').textContent = 'Error fetching data from the server';
+      }
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+</body>
+</html>
